@@ -2,7 +2,7 @@ import "./ErrorMessage.css";
 
 import React from "react";
 
-import { branding } from "@carrot2/config/branding.js";
+import branding from "@carrot2/config/branding.js";
 
 export const ErrorMessage = ({ children }) => {
   return (
@@ -25,6 +25,7 @@ export const GenericErrorMessage = ({ error, children }) => {
     <ErrorMessage error={error}>
       {children}
       <pre>{message}</pre>
+      <p>{branding.createProductName()}</p>
     </ErrorMessage>
   );
 };
@@ -33,7 +34,7 @@ export const GenericSearchEngineErrorMessage = ({ error }) => {
   return (
     <GenericErrorMessage error={error}>
       <h2>Search engine error</h2>
-      <p>Search could not be performed due to the following error:</p>
+      <p>{branding.createProductName()}: Search could not be performed due to the following error:</p>
     </GenericErrorMessage>
   );
 };
@@ -58,7 +59,7 @@ const ResponseInfo = ({ response }) => {
       <dd>{response.url}</dd>
       <dt>Status</dt>
       <dd>
-        {response.status} {response.statusText}
+        {error.response.status} {error.response.statusText}
       </dd>
     </dl>
   );
@@ -75,7 +76,7 @@ export const HttpErrorMessage = ({ error, children }) => {
 
 export const ClusteringServerRateLimitExceededError = () => {
   return (
-    <div className="Error">
+    <div className="RateLimitError">
       <h2>Too many clustering requests</h2>
 
       <p>
@@ -94,7 +95,7 @@ export const ClusteringServerRateLimitExceededError = () => {
 
 export const ClusteringRequestSizeLimitExceededError = () => {
   return (
-    <div className="Error">
+    <div className="SizeLimitError">
       <h2>Too much data to cluster</h2>
 
       <p>
@@ -113,7 +114,7 @@ export const ClusteringRequestSizeLimitExceededError = () => {
 
 export const ClusteringExceptionMessage = ({ exception }) => {
   return (
-    <div className="Error">
+    <div className="ExceptionError">
       <h2>Clustering engine error</h2>
 
       <p>Results could not be clustered due to the following error:</p>
@@ -127,7 +128,7 @@ export const ClusteringExceptionMessage = ({ exception }) => {
 
 export const ClusteringErrorMessage = ({ message }) => {
   return (
-    <ErrorMessage>
+    <ErrorMessage><p>{branding.createProductName()}</p>
       <h2>Clustering engine error</h2>
 
       <p>Results could not be clustered due to the following error:</p>
@@ -152,6 +153,22 @@ export const createClusteringErrorElement = error => {
     if (error.bodyParsed.message) {
       return <ClusteringErrorMessage message={error.bodyParsed.message} />;
     }
+  }
+
+  if(error && error.type === 'server_rate_limit') {
+    return <ClusteringServerRateLimitExceededError />;
+  }
+
+  if(error && error.type === 'request_size_limit') {
+    return <ClusteringRequestSizeLimitExceededError />;
+  }
+
+  if(error && error.exception) {
+    return <ClusteringExceptionMessage exception={error.exception} />;
+  }
+
+  if(error && error.message) {
+    return <ClusteringErrorMessage message={error.message} />;
   }
 
   return (
