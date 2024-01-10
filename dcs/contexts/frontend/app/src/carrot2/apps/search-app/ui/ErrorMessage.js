@@ -99,8 +99,7 @@ export const ClusteringRequestSizeLimitExceededError = () => {
       <h2>Too much data to cluster</h2>
 
       <p>
-        You sent too much data for our little demo server to handle. Lower the
-        number of search results and try again.
+        You sent too much data for our demo server to handle. Please reduce the number of search results and try again.
       </p>
 
       <p>
